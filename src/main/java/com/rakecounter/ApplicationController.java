@@ -1,5 +1,6 @@
 package com.rakecounter;
 
+import com.rakecounter.models.Stake;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024, // 1 MB
@@ -39,8 +41,8 @@ public class ApplicationController {
             hands.add(handsFromFile);
         }
         RakeCounter rakeCounter = new RakeCounter();
-        CountResult result = rakeCounter.process(hands);
-        model.addAttribute("result", result);
+        Map<Stake, CountResult> results = rakeCounter.process(hands);
+        model.addAttribute("result", results);
         return "test";
     }
 }

@@ -1,26 +1,30 @@
 package com.rakecounter;
 
+import com.rakecounter.models.Stake;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RakeCounter {
     public static final String SPLIT_HANDS_BY_LINE = "Poker Hand ";
     public static final String CURRENCY = "\\$(\\d+\\.?\\d*)";
-    private CountResult countResult;
+    private Map<Stake, CountResult> results;
 
     public RakeCounter() {
-        this.countResult = new CountResult();
+        this.results = new HashMap<>();
     }
 
-    public CountResult process(List<String> hands) {
+    public Map<Stake, CountResult> process(List<String> hands) {
         for (String handsPart : hands) {
             String[] split = handsPart.split(SPLIT_HANDS_BY_LINE);
             for (String s : split) {
                 count(s);
             }
         }
-        return this.countResult;
+        return this.results;
     }
 
 
@@ -28,6 +32,7 @@ public class RakeCounter {
         int winnersCount = 0;
         double gRakeFromHand = 0;
         double jpRakeFromHand = 0;
+        Stake stake = Stake.UNK;
         if (hand.contains("Dealt to Hero")) {
             if (hand.contains("Hero collected")) {
                 String rakeRegex = "Rake " + CURRENCY;
@@ -56,17 +61,27 @@ public class RakeCounter {
                 gRakeFromHand /= winnersCount;
             }
             int countPlayers = countPlayers(hand);
-            System.out.println(countPlayers);
-            System.out.println(hand);
-            if (countPlayers == 2) {
-                countResult.setGeneralRakeHU(gRakeFromHand + countResult.getGeneralRakeHU());
-                countResult.setJackpotRakeHU(jpRakeFromHand + countResult.getJackpotRakeHU());
-                countResult.setNumberOfHandsHU(countResult.getNumberOfHandsHU() + 1);
+            stake = parseHandHistoryStakeLevel(hand);
+            if (!results.containsKey(stake)) {
+                CountResult countResult = new CountResult();
+                addNewResult(gRakeFromHand, jpRakeFromHand, countPlayers, countResult);
+                results.put(stake, countResult);
             } else {
-                countResult.setGeneralRake(gRakeFromHand + countResult.getGeneralRake());
-                countResult.setJackpotRake(jpRakeFromHand + countResult.getJackpotRake());
-                countResult.setNumberOfHands(countResult.getNumberOfHands() + 1);
+                CountResult countResult = results.get(stake);
+                addNewResult(gRakeFromHand, jpRakeFromHand, countPlayers, countResult);
             }
+        }
+    }
+
+    private void addNewResult(double gRakeFromHand, double jpRakeFromHand, int countPlayers, CountResult countResult) {
+        if (countPlayers == 2) {
+            countResult.setGeneralRakeHU(gRakeFromHand + countResult.getGeneralRakeHU());
+            countResult.setJackpotRakeHU(jpRakeFromHand + countResult.getJackpotRakeHU());
+            countResult.setNumberOfHandsHU(countResult.getNumberOfHandsHU() + 1);
+        } else {
+            countResult.setGeneralRake(gRakeFromHand + countResult.getGeneralRake());
+            countResult.setJackpotRake(jpRakeFromHand + countResult.getJackpotRake());
+            countResult.setNumberOfHands(countResult.getNumberOfHands() + 1);
         }
     }
 
@@ -112,5 +127,30 @@ public class RakeCounter {
             numberOfPlayers++;
         }
         return numberOfPlayers;
+    }
+
+    private Stake parseHandHistoryStakeLevel(String hand) {
+        Pattern stakePattern = Pattern.compile("posts the ante " + CURRENCY);
+        Matcher stakeMatcher = stakePattern.matcher(hand);
+        Stake stake1 = Stake.UNK;
+        if (stakeMatcher.find()) {
+            String stake = stakeMatcher.group(1);
+            if (stake.equals("1")) {
+                stake1 = Stake.S_100;
+            }
+            if (stake.equals("2")) {
+                stake1 = Stake.S_200;
+            }
+            if (stake.equals("0.5")) {
+                stake1 = Stake.S_50;
+            }
+            if (stake.equals("0.25")) {
+                stake1 = Stake.S_25;
+            }
+            if (stake.equals("0.1")) {
+                stake1 = Stake.S_10;
+            }
+        }
+        return stake1;
     }
 }

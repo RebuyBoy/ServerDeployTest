@@ -56,4 +56,15 @@ public class CountResult {
         this.jackpotRake = jackpotRake;
     }
 
+    @Override
+    public String toString() {
+        return "CountResult{" +
+                "numberOfHands=" + numberOfHands +
+                ", generalRake=" + generalRake +
+                ", jackpotRake=" + jackpotRake +
+                ", numberOfHandsHU=" + numberOfHandsHU +
+                ", generalRakeHU=" + generalRakeHU +
+                ", jackpotRakeHU=" + jackpotRakeHU +
+                '}';
+    }
 }

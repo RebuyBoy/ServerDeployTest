@@ -6,10 +6,11 @@ import java.util.regex.Pattern;
 
 public class RakeCounter {
     public static final String SPLIT_HANDS_BY_LINE = "Poker Hand ";
+    public static final String CURRENCY = "\\$(\\d+\\.?\\d*)";
     private CountResult countResult;
 
     public RakeCounter() {
-        this.countResult =new CountResult();
+        this.countResult = new CountResult();
     }
 
     public CountResult process(List<String> hands) {
@@ -19,7 +20,6 @@ public class RakeCounter {
                 count(s);
             }
         }
-        System.out.println(countResult.getNumberOfHands());
         return this.countResult;
     }
 
@@ -28,10 +28,10 @@ public class RakeCounter {
         int winnersCount = 0;
         double gRakeFromHand = 0;
         double jpRakeFromHand = 0;
-        if(hand.contains("Dealt to Hero")) {
+        if (hand.contains("Dealt to Hero")) {
             if (hand.contains("Hero collected")) {
-                String rakeRegex = "Rake .(\\d+.?\\d*)";
-                String jackpotRegex = "Jackpot .(\\d+.?\\d*)";
+                String rakeRegex = "Rake " + CURRENCY;
+                String jackpotRegex = "Jackpot " + CURRENCY;
                 String collected = "collected";
                 Pattern pattern = Pattern.compile(rakeRegex);
                 Pattern patternJ = Pattern.compile(jackpotRegex);
@@ -55,10 +55,62 @@ public class RakeCounter {
                 jpRakeFromHand /= winnersCount;
                 gRakeFromHand /= winnersCount;
             }
-            countResult.setGeneralRake(gRakeFromHand + countResult.getGeneralRake());
-            countResult.setJackpotRake(jpRakeFromHand + countResult.getJackpotRake());
-            countResult.setNumberOfHands(countResult.getNumberOfHands() + 1);
+            int countPlayers = countPlayers(hand);
+            System.out.println(countPlayers);
+            System.out.println(hand);
+            if (countPlayers == 2) {
+                countResult.setGeneralRakeHU(gRakeFromHand + countResult.getGeneralRakeHU());
+                countResult.setJackpotRakeHU(jpRakeFromHand + countResult.getJackpotRakeHU());
+                countResult.setNumberOfHandsHU(countResult.getNumberOfHandsHU() + 1);
+            } else {
+                countResult.setGeneralRake(gRakeFromHand + countResult.getGeneralRake());
+                countResult.setJackpotRake(jpRakeFromHand + countResult.getJackpotRake());
+                countResult.setNumberOfHands(countResult.getNumberOfHands() + 1);
+            }
+        }
+    }
+
+
+    private void countProfit(String hand) {
+        double profit = 0;
+        String betsRegex = "Hero: bets " + CURRENCY;
+        String raisesRegex = "Hero: raises " + CURRENCY;
+        String callsRegex = "Hero: calls " + CURRENCY;
+        String returnedRegex = CURRENCY + "\\) returned to Hero";
+
+        Pattern patternBets = Pattern.compile(betsRegex);
+        Pattern patternRaises = Pattern.compile(raisesRegex);
+        Pattern patternCalls = Pattern.compile(callsRegex);
+        Matcher matcherBets = patternBets.matcher(hand);
+        Matcher matcherRaises = patternRaises.matcher(hand);
+        Matcher matcherCalls = patternCalls.matcher(hand);
+
+        while (matcherBets.find()) {
+            String bets = matcherBets.group(1);
+            double parsedBet = Double.parseDouble(bets);
+            profit += parsedBet;
+        }
+        while (matcherRaises.find()) {
+            String raises = matcherRaises.group(1);
+            double parsedRaise = Double.parseDouble(raises);
+            profit += parsedRaise;
+        }
+        while (matcherCalls.find()) {
+            String raises = matcherRaises.group(1);
+            double parsedRaise = Double.parseDouble(raises);
+            profit += parsedRaise;
         }
 
+
+    }
+
+    private int countPlayers(String hand) {
+        int numberOfPlayers = 0;
+        Pattern playerPattern = Pattern.compile("Seat (\\d): (\\w+) \\(\\$(\\d+\\.?\\d*) in chips\\)");
+        Matcher playerMatcher = playerPattern.matcher(hand);
+        while (playerMatcher.find()) {
+            numberOfPlayers++;
+        }
+        return numberOfPlayers;
     }
 }

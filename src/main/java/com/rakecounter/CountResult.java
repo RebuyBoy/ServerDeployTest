@@ -4,6 +4,33 @@ public class CountResult {
     private int numberOfHands;
     private double generalRake;
     private double jackpotRake;
+    private int numberOfHandsHU;
+    private double generalRakeHU;
+    private double jackpotRakeHU;
+
+    public int getNumberOfHandsHU() {
+        return numberOfHandsHU;
+    }
+
+    public void setNumberOfHandsHU(int numberOfHandsHU) {
+        this.numberOfHandsHU = numberOfHandsHU;
+    }
+
+    public double getGeneralRakeHU() {
+        return generalRakeHU;
+    }
+
+    public void setGeneralRakeHU(double generalRakeHU) {
+        this.generalRakeHU = generalRakeHU;
+    }
+
+    public double getJackpotRakeHU() {
+        return jackpotRakeHU;
+    }
+
+    public void setJackpotRakeHU(double jackpotRakeHU) {
+        this.jackpotRakeHU = jackpotRakeHU;
+    }
 
     public int getNumberOfHands() {
         return numberOfHands;
@@ -29,12 +56,4 @@ public class CountResult {
         this.jackpotRake = jackpotRake;
     }
 
-    @Override
-    public String toString() {
-        return "CountResult{" +
-                "numberOfHands=" + numberOfHands +
-                ", generalRake=" + generalRake +
-                ", jackpotRake=" + jackpotRake +
-                '}';
-    }
 }

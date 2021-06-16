@@ -40,9 +40,6 @@ public class ApplicationController {
         }
         RakeCounter rakeCounter = new RakeCounter();
         CountResult result = rakeCounter.process(hands);
-        System.out.println(result.getNumberOfHands());
-        System.out.println(result.getGeneralRake());
-        System.out.println(result.getJackpotRake());
         model.addAttribute("result", result);
         return "test";
     }

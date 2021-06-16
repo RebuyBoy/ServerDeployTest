@@ -11,10 +11,11 @@
     <input type="submit" value="Upload file" name="submit">
 </form>
 
-<div th:if="${result.numberOfHands > 0}">
+<div th:if="${(result.numberOfHands+result.numberOfHandsHU) > 0}">
     <table class="table">
         <thead>
         <tr>
+            <th scope="col">Players</th>
             <th scope="col">Hands</th>
             <th scope="col">GG rake</th>
             <th scope="col">JP rake</th>
@@ -23,10 +24,26 @@
         </thead>
         <tbody>
         <tr>
+            <td th:text="'3-5'"></td>
             <td th:text="${result.numberOfHands}"></td>
-            <td th:text="${#numbers.formatDecimal(result.generalRake,0,0)}"></td>
-            <td th:text="${#numbers.formatDecimal(result.jackpotRake,0,0)}"></td>
-            <td th:text="${#numbers.formatDecimal((result.jackpotRake+result.generalRake),0,0)}"></td>
+            <td th:text="${#numbers.formatDecimal(result.generalRake,0,1)}"></td>
+            <td th:text="${#numbers.formatDecimal(result.jackpotRake,0,1)}"></td>
+            <td th:text="${#numbers.formatDecimal((result.jackpotRake+result.generalRake),0,1)}"></td>
+        </tr>
+        <tr>
+            <td th:text="2"></td>
+            <td th:text="${result.numberOfHandsHU}"></td>
+            <td th:text="${#numbers.formatDecimal(result.generalRakeHU,0,1)}"></td>
+            <td th:text="${#numbers.formatDecimal(result.jackpotRakeHU,0,1)}"></td>
+            <td th:text="${#numbers.formatDecimal((result.jackpotRakeHU+result.generalRakeHU),0,1)}"></td>
+        </tr>
+
+        <tr>
+            <td th:text="Total"></td>
+            <td th:text="${result.numberOfHandsHU+result.numberOfHands}"></td>
+            <td th:text="${#numbers.formatDecimal(result.generalRakeHU + result.generalRake,0,1)}"></td>
+            <td th:text="${#numbers.formatDecimal(result.jackpotRakeHU+result.jackpotRake,0,1)}"></td>
+            <td th:text="${#numbers.formatDecimal(result.jackpotRakeHU+result.generalRakeHU+(result.jackpotRake+result.generalRake),0,1)}"></td>
         </tr>
         </tbody>
     </table>

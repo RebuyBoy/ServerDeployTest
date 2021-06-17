@@ -32,7 +32,7 @@ public class RakeCounter {
         int winnersCount = 0;
         double gRakeFromHand = 0;
         double jpRakeFromHand = 0;
-        Stake stake = Stake.UNK;
+//        Stake stake;
         if (hand.contains("Dealt to Hero")) {
             if (hand.contains("Hero collected")) {
                 String rakeRegex = "Rake " + CURRENCY;
@@ -61,7 +61,7 @@ public class RakeCounter {
                 gRakeFromHand /= winnersCount;
             }
             int countPlayers = countPlayers(hand);
-            stake = parseHandHistoryStakeLevel(hand);
+            Stake stake = parseHandHistoryStakeLevel(hand);
             if (!results.containsKey(stake)) {
                 CountResult countResult = new CountResult();
                 addNewResult(gRakeFromHand, jpRakeFromHand, countPlayers, countResult);

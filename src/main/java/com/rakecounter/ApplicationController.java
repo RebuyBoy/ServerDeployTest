@@ -13,6 +13,7 @@ import javax.servlet.annotation.MultipartConfig;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,8 +27,8 @@ import java.util.Map;
 public class ApplicationController {
     @GetMapping
     protected String main(Model model) {
-        CountResult result = new CountResult();
-        model.addAttribute("result", result);
+        Map<Stake, CountResult> results = new HashMap<>();
+        model.addAttribute("result", results);
         return "test";
     }
 

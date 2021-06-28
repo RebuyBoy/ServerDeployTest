@@ -19,8 +19,8 @@ import java.util.Map;
 
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024, // 1 MB
-        maxFileSize = 1024 * 1024 * 10,      // 10 MB
-        maxRequestSize = 1024 * 1024 * 100   // 100 MB
+        maxFileSize = 1024 * 1024 * 50,      // 50 MB
+        maxRequestSize = 1024 * 1024 * 500   // 500 MB
 )
 @Controller()
 @RequestMapping("/")

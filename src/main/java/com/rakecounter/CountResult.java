@@ -7,6 +7,24 @@ public class CountResult {
     private int numberOfHandsHU;
     private double generalRakeHU;
     private double jackpotRakeHU;
+    private double profit;
+    private double profitHu;
+
+    public double getProfitHu() {
+        return profitHu;
+    }
+
+    public void setProfitHu(double profitHu) {
+        this.profitHu = profitHu;
+    }
+
+    public double getProfit() {
+        return profit;
+    }
+
+    public void setProfit(double profit) {
+        this.profit = profit;
+    }
 
     public int getNumberOfHandsHU() {
         return numberOfHandsHU;

@@ -9,9 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,8 @@ import java.util.Map;
 @Controller()
 @RequestMapping("/")
 public class ApplicationController {
+    private List<String> hands = new ArrayList<>();
+
     @GetMapping
     protected String main(Model model) {
         Map<Stake, CountResult> results = new HashMap<>();
@@ -34,16 +37,50 @@ public class ApplicationController {
 
     @PostMapping
     public String getFile(Model model, @RequestParam("file") MultipartFile[] file) throws IOException {
-        List<String> hands = new ArrayList<>();
         HandHistoryReader hhr = new HandHistoryReader();
-        for (MultipartFile filePart : file) {
-            InputStream inputStream = filePart.getInputStream();
-            String handsFromFile = hhr.getHandsFromFiles(inputStream);
-            hands.add(handsFromFile);
-        }
+        hands = hhr.getHandsFromFiles(file);
         RakeCounter rakeCounter = new RakeCounter();
         Map<Stake, CountResult> results = rakeCounter.process(hands);
         model.addAttribute("result", results);
-        return "test";
+
+//        Archiver archiver = new Archiver();
+//        byte[] archive = archiver.archive(hands);
+//        String fileName = "hh.zip";
+//        response.setContentType("application/octet-stream");
+//        response.addHeader("Content-Disposition", "attachment; filename=" + fileName);
+//        ServletOutputStream outputStream = response.getOutputStream();
+//        outputStream.write(archive);
+//        outputStream.flush();
+
+
+        return "rakeTable";
     }
+
+    @GetMapping("/download")
+    public String downloadFile(Model model, HttpServletResponse response) throws IOException {
+        Archiver archiver = new Archiver();
+        byte[] archive = archiver.archive(hands);
+        String fileName = "hh.zip";
+        response.setContentType("application/octet-stream");
+        response.addHeader("Content-Disposition", "attachment; filename=" + fileName);
+        ServletOutputStream outputStream = response.getOutputStream();
+        outputStream.write(archive);
+        outputStream.flush();
+        return "rakeTable";
+    }
+//     @PostMapping
+//    public String getFile(Model model, @RequestParam("file") MultipartFile[] file) throws IOException {
+//        List<String> hands = new ArrayList<>();
+//        HandHistoryReader hhr = new HandHistoryReader();
+//        for (MultipartFile filePart : file) {
+//            InputStream inputStream = filePart.getInputStream();
+//            String handsFromFile = hhr.getHandsFromFiles(inputStream);
+//            hands.add(handsFromFile);
+//        }
+//        RakeCounter rakeCounter = new RakeCounter();
+//        Map<Stake, CountResult> results = rakeCounter.process(hands);
+//        model.addAttribute("result", results);
+//        return "test";
+//    }
+//
 }

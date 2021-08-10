@@ -33,14 +33,7 @@
     <br>
     <br>
     <!--//TODO сетка в таблице-->
-    <table th:border="1" style="width:80%;" class="table" th:each="entry,iterStat : ${result}"
-           th:if="not ${entry.key.name().equals('UNK')}"
-           th:with="hands=${entry.value.numberOfHands}
-                   ,stake=${entry.key.toString().substring(2)}
-                   ,ggRake=${entry.value.generalRake}
-                   ,jpRake=${entry.value.jackpotRake}
-                   ,profit=${entry.value.profit}
-                   ,ante=${entry.key.getStakeAnte(entry.key)}">
+    <table th:border="1" style="width:80%;" class="table">
 
         <thead>
         <tr style="background-color: chocolate">
@@ -52,7 +45,14 @@
             <th style="width: 10px" scope="col">Profit</th>
         </tr>
         </thead>
-        <tr style="background-color: darkgray" th:if="${hands} > 0">
+        <tr style="background-color: darkgray" th:each="entry,iterStat : ${result}"
+            th:if="not ${entry.key.name().equals('UNK')} "
+            th:with="hands=${entry.value.numberOfHands}
+                   ,stake=${entry.key.toString().substring(2)}
+                   ,ggRake=${entry.value.generalRake}
+                   ,jpRake=${entry.value.jackpotRake}
+                   ,profit=${entry.value.profit}
+                   ,ante=${entry.key.getStakeAnte(entry.key)}">
             <td th:text="${stake}"></td>
             <td th:text="${hands}"></td>
             <td th:text="${#numbers.formatDecimal(ggRake,0,0)} + ' ' +'('+ |${#numbers.formatDecimal(ggRake/hands/ante*100,0,1)}|+')'"></td>

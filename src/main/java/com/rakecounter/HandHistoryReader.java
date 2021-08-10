@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HandHistoryReader {
-    private final int maxFileSizeThreshold = 1024 * 1024 * 20 - 30000;
+    private final int maxFileSizeThreshold = 1024 * 1024 * 15;
 
     public List<String> getHandsFromFiles(MultipartFile[] filePart) {
         StringBuilder hands = new StringBuilder();

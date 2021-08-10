@@ -5,6 +5,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
     <style>
+        body {
+            background-color: #505050;
+        }
+
         .center {
             margin: auto;
             width: 80%;
@@ -23,54 +27,38 @@
         <br>
         <br>
     </form>
-    <form action="/download" >
+    <form action="/download">
         <input type="submit" value="download">
     </form>
-        <br>
-        <br>
+    <br>
+    <br>
     <!--//TODO сетка в таблице-->
-    <table th:border="1" style="width:80%;" class="table" th:each="entry,iterStat : ${result}" th:if="not ${entry.key.name().equals('UNK')}"
+    <table th:border="1" style="width:80%;" class="table" th:each="entry,iterStat : ${result}"
+           th:if="not ${entry.key.name().equals('UNK')}"
            th:with="hands=${entry.value.numberOfHands}
-                   ,handsHu=${entry.value.numberOfHandsHU}
                    ,stake=${entry.key.toString().substring(2)}
-                   ,ante=${entry.key.getStakeAnte(entry.key)}
                    ,ggRake=${entry.value.generalRake}
                    ,jpRake=${entry.value.jackpotRake}
-                   ,ggRakeHU=${entry.value.generalRakeHU}
-                   ,jpRakeHU=${entry.value.jackpotRakeHU}">
+                   ,profit=${entry.value.profit}
+                   ,ante=${entry.key.getStakeAnte(entry.key)}">
+
         <thead>
         <tr style="background-color: chocolate">
             <th style="width: 1cm" scope="col">Limit</th>
-            <th style="width: 5px" scope="col">Players</th>
             <th style="width: 10px" scope="col">Hands</th>
             <th style="width: 10px" scope="col">GG rake</th>
             <th style="width: 10px" scope="col">JP rake</th>
             <th style="width: 10px" scope="col">Total</th>
+            <th style="width: 10px" scope="col">Profit</th>
         </tr>
         </thead>
-        <tr th:if="${hands} > 0">
+        <tr style="background-color: darkgray" th:if="${hands} > 0">
             <td th:text="${stake}"></td>
-            <td th:text="'3-5'"></td>
             <td th:text="${hands}"></td>
             <td th:text="${#numbers.formatDecimal(ggRake,0,0)} + ' ' +'('+ |${#numbers.formatDecimal(ggRake/hands/ante*100,0,1)}|+')'"></td>
             <td th:text="${#numbers.formatDecimal(jpRake,0,0)} + ' ' +'('+ |${#numbers.formatDecimal(jpRake/hands/ante*100,0,1)}|+')'"></td>
             <td th:text="${#numbers.formatDecimal((ggRake+jpRake),0,1)} + ' ' +'('+ |${#numbers.formatDecimal((ggRake+jpRake)/hands/ante*100,0,1)}|+')'"></td>
-        </tr>
-        <tr th:if="${handsHu} > 0">
-            <td th:text="${stake}"></td>
-            <td th:text="2"></td>
-            <td th:text="${handsHu}"></td>
-            <td th:text="${#numbers.formatDecimal(ggRakeHU,0,1)}+ ' ' +'('+ |${#numbers.formatDecimal(ggRakeHU/handsHu/ante*100,0,1)}|+')'"></td>
-            <td th:text="${#numbers.formatDecimal(jpRakeHU,0,1)}+ ' ' +'('+ |${#numbers.formatDecimal(jpRakeHU/handsHu/ante*100,0,1)}|+')'"></td>
-            <td th:text="${#numbers.formatDecimal((ggRakeHU+jpRakeHU),0,1)}+ ' ' +'('+ |${#numbers.formatDecimal((ggRakeHU+jpRakeHU)/handsHu/ante*100,0,1)}|+')'"></td>
-        </tr>
-        <tr th:if="${handsHu} > 0 and ${hands} > 0" style="background-color: #d9d7d7">
-            <td th:text="${stake}"></td>
-            <td th:text="all"></td>
-            <td th:text="${handsHu+hands}"></td>
-            <td th:text="${#numbers.formatDecimal(ggRakeHU+ggRake,0,1)}+ ' ' +'('+ |${#numbers.formatDecimal((ggRake+ggRakeHU)/(hands+handsHu)/ante*100,0,1)}|+')'"></td>
-            <td th:text="${#numbers.formatDecimal(jpRakeHU+jpRake,0,1)}+ ' ' +'('+ |${#numbers.formatDecimal((jpRake+jpRakeHU)/(hands+handsHu)/ante*100,0,1)}|+')'"></td>
-            <td th:text="${#numbers.formatDecimal((ggRakeHU+jpRakeHU+ggRake+jpRake),0,1)}+ ' ' +'('+ |${#numbers.formatDecimal((ggRake+ggRakeHU+jpRakeHU+jpRake)/(hands+handsHu)/ante*100,0,1)}|+')'"></td>
+            <td th:text="${#numbers.formatDecimal((profit),0,1)} + ' ' +'('+ |${#numbers.formatDecimal((profit)/hands/ante*100,0,1)}|+')'"></td>
         </tr>
     </table>
 

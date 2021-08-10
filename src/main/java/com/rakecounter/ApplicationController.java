@@ -1,6 +1,7 @@
 package com.rakecounter;
 
 import com.rakecounter.models.Stake;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +28,9 @@ import java.util.Map;
 @RequestMapping("/")
 public class ApplicationController {
     private List<String> hands = new ArrayList<>();
+    @Autowired
+    private HandParser handParser;
+
 
     @GetMapping
     protected String main(Model model) {
@@ -39,20 +43,8 @@ public class ApplicationController {
     public String getFile(Model model, @RequestParam("file") MultipartFile[] file) throws IOException {
         HandHistoryReader hhr = new HandHistoryReader();
         hands = hhr.getHandsFromFiles(file);
-        RakeCounter rakeCounter = new RakeCounter();
-        Map<Stake, CountResult> results = rakeCounter.process(hands);
+        Map<Stake, CountResult> results = handParser.parse(hands);
         model.addAttribute("result", results);
-
-//        Archiver archiver = new Archiver();
-//        byte[] archive = archiver.archive(hands);
-//        String fileName = "hh.zip";
-//        response.setContentType("application/octet-stream");
-//        response.addHeader("Content-Disposition", "attachment; filename=" + fileName);
-//        ServletOutputStream outputStream = response.getOutputStream();
-//        outputStream.write(archive);
-//        outputStream.flush();
-
-
         return "rakeTable";
     }
 

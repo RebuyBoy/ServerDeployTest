@@ -49,7 +49,7 @@ public class PlayerInvestments {
             if (action.contains("Hero: raises")) {
                 Matcher matcher = Pattern.compile(raisesRegex).matcher(action);
                 if (matcher.find()) {
-                    if (matcher.group(2).length() == 0) {
+                    if (matcher.group(2)==null) {
                         raises = Double.parseDouble(matcher.group(1));
                     } else {
                         raises = Double.parseDouble(matcher.group(2));

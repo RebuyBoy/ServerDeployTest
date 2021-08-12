@@ -35,6 +35,12 @@ public class HandParser {
         this.handlist = new ArrayList<>();
     }
 
+    public static void main(String[] args) {
+        String a = "1,204.04";
+        double v = Double.parseDouble(a);
+        System.out.println(v);
+    }
+
     public Map<Stake, CountResult> parse(List<String> hands) {
         for (String partOfHands : hands) {
             String[] split = partOfHands.split(SPLIT_HANDS_BY_LINE);
@@ -66,7 +72,7 @@ public class HandParser {
                 double jackpotRake = countResult.getJackpotRake();
                 countResult.setJackpotRake(jpRake + jackpotRake);
 
-                if(player.isJackpot()){
+                if (player.isJackpot()) {
                     double jpCount = countResult.getJPCount();
                     countResult.setJPCount(++jpCount);
                 }
@@ -139,16 +145,27 @@ public class HandParser {
         Matcher matcher = Pattern.compile("Total pot " + CURRENCY).matcher(hand);
         double totalPot = 0;
         if (matcher.find()) {
-            totalPot = Double.parseDouble(matcher.group(1));
+            String group = matcher.group(1);
+            String checked = check(group);
+            totalPot = Double.parseDouble(checked);
         }
         return totalPot;
+    }
+
+    private String check(String group) {
+        if (group.contains(",")) {
+            return group.replaceAll(",", "");
+        }
+        return group;
     }
 
     private double getGGRake(String hand) {
         Matcher matcher = Pattern.compile("Rake " + CURRENCY).matcher(hand);
         double ggRake = 0;
         if (matcher.find()) {
-            ggRake = Double.parseDouble(matcher.group(1));
+            String rake = matcher.group(1);
+            String checkedRake = check(rake);
+            ggRake = Double.parseDouble(checkedRake);
         }
         return ggRake;
     }
@@ -157,7 +174,9 @@ public class HandParser {
         Matcher matcher = Pattern.compile("Jackpot " + CURRENCY).matcher(hand);
         double jpRake = 0;
         if (matcher.find()) {
-            jpRake = Double.parseDouble(matcher.group(1));
+            String rake = matcher.group(1);
+            String checked = check(rake);
+            jpRake = Double.parseDouble(checked);
         }
         return jpRake;
     }
@@ -176,32 +195,12 @@ public class HandParser {
     private Stake parseHandHistoryStakeLevel(String hand) {
         Pattern stakePattern = Pattern.compile("posts the ante " + CURRENCY);
         Matcher stakeMatcher = stakePattern.matcher(hand);
-        Stake stake1 = Stake.UNK;
+        Stake stake = Stake.UNK;
         if (stakeMatcher.find()) {
-            String stake = stakeMatcher.group(1);
-            if (stake.equals("5")) {
-                stake1 = Stake.S_500;
-            }
-            if (stake.equals("10")) {
-                stake1 = Stake.S_1000;
-            }
-            if (stake.equals("1")) {
-                stake1 = Stake.S_100;
-            }
-            if (stake.equals("2")) {
-                stake1 = Stake.S_200;
-            }
-            if (stake.equals("0.5")) {
-                stake1 = Stake.S_50;
-            }
-            if (stake.equals("0.25")) {
-                stake1 = Stake.S_25;
-            }
-            if (stake.equals("0.1")) {
-                stake1 = Stake.S_10;
-            }
+            String parsedStake = stakeMatcher.group(1);
+            stake = Stake.getStakeByAnte(parsedStake);
         }
-        return stake1;
+        return stake;
     }
 
     private int countPlayers(String hand) {

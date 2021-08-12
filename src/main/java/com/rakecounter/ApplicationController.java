@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +28,9 @@ import java.util.Map;
 @Controller()
 @RequestMapping("/")
 public class ApplicationController {
-    private List<String> hands = new ArrayList<>();
     @Autowired
     private HandParser handParser;
+    private Map<String, List<String>> userHands = new HashMap<>();
 
 
     @GetMapping
@@ -42,15 +42,19 @@ public class ApplicationController {
 
     @PostMapping
     public String getFile(Model model, @RequestParam("file") MultipartFile[] file) throws IOException {
+        String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
         HandHistoryReader hhr = new HandHistoryReader();
-        hands = hhr.getHandsFromFiles(file);
+        List<String> hands = hhr.getHandsFromFiles(file);
         Map<Stake, CountResult> results = handParser.parse(hands);
         model.addAttribute("result", results);
+        userHands.put(sessionId, hands);
         return "rakeTable";
     }
 
     @GetMapping("/download")
     public String downloadFile(Model model, HttpServletResponse response) throws IOException {
+        String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
+        List<String> hands = userHands.get(sessionId);
         Archiver archiver = new Archiver();
         byte[] archive = archiver.archive(hands);
         String fileName = "hh.zip";
@@ -61,19 +65,4 @@ public class ApplicationController {
         outputStream.flush();
         return "rakeTable";
     }
-//     @PostMapping
-//    public String getFile(Model model, @RequestParam("file") MultipartFile[] file) throws IOException {
-//        List<String> hands = new ArrayList<>();
-//        HandHistoryReader hhr = new HandHistoryReader();
-//        for (MultipartFile filePart : file) {
-//            InputStream inputStream = filePart.getInputStream();
-//            String handsFromFile = hhr.getHandsFromFiles(inputStream);
-//            hands.add(handsFromFile);
-//        }
-//        RakeCounter rakeCounter = new RakeCounter();
-//        Map<Stake, CountResult> results = rakeCounter.process(hands);
-//        model.addAttribute("result", results);
-//        return "test";
-//    }
-//
 }

@@ -4,7 +4,6 @@ import com.rakecounter.models.HandHistory;
 import com.rakecounter.models.Player;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -108,7 +107,11 @@ public class PlayerInvestments {
         double totalPot = handHistory.getTotalPot();
         double ggRake = handHistory.getGgRake();
         double jpRake = handHistory.getJpRake();
-        return collected / (totalPot - ggRake - jpRake) * ggRake;
+        double result = collected / (totalPot - ggRake - jpRake) * ggRake;
+        if (Double.isNaN(result)) {
+            return 0;
+        }
+        return result;
     }
 
     public double countJpRake(HandHistory handHistory) {
@@ -119,6 +122,10 @@ public class PlayerInvestments {
         double totalPot = handHistory.getTotalPot();
         double ggRake = handHistory.getGgRake();
         double jpRake = handHistory.getJpRake();
-        return collected / (totalPot - ggRake - jpRake) * jpRake;
+        double result = collected / (totalPot - ggRake - jpRake) * jpRake;
+        if (Double.isNaN(result)) {
+            return 0;
+        }
+        return result;
     }
 }

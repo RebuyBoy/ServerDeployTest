@@ -112,7 +112,9 @@ public class PlayerParser {
         Matcher matcher = Pattern.compile(stackSizeHeroRegex).matcher(hand);
         double stackSize = 0;
         if (matcher.find()) {
-            stackSize = Double.parseDouble(matcher.group(1));
+            String group = matcher.group(1);
+            String checked = check(group);
+            stackSize = Double.parseDouble(checked);
         }
         return stackSize;
     }
@@ -131,6 +133,13 @@ public class PlayerParser {
             return true;
         }
         return !Pattern.compile("Hero: folds").matcher(hand).find();
+    }
+
+    private String check(String group) {
+        if (group.contains(",")) {
+            return group.replaceAll(",", "");
+        }
+        return group;
     }
 
 

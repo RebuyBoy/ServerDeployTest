@@ -33,16 +33,18 @@
     <br>
     <br>
     <!--//TODO сетка в таблице-->
-    <table th:border="1" style="width:80%;" class="table">
+    <table th:border="1" style="width:100%;" class="table" th:if="${result.size()>0}">
 
         <thead>
         <tr style="background-color: chocolate">
             <th style="width: 1cm" scope="col">Limit</th>
-            <th style="width: 10px" scope="col">Hands</th>
-            <th style="width: 10px" scope="col">GG rake</th>
+            <th style="width: 5px" scope="col">Hands</th>
+            <th style="width: 5px" scope="col">GG rake</th>
             <th style="width: 10px" scope="col">JP rake</th>
-            <th style="width: 10px" scope="col">Total</th>
+            <th style="width: 10px" scope="col">Jackpots</th>
+            <th style="width: 10px" scope="col">Buffet</th>
             <th style="width: 10px" scope="col">Profit</th>
+
         </tr>
         </thead>
         <tr style="background-color: darkgray" th:each="entry,iterStat : ${result}"
@@ -52,13 +54,18 @@
                    ,ggRake=${entry.value.generalRake}
                    ,jpRake=${entry.value.jackpotRake}
                    ,profit=${entry.value.profit}
-                   ,ante=${entry.key.getStakeAnte(entry.key)}">
+                   ,ante=${entry.key.getStakeAnte(entry.key)}
+                   ,jpCount=${entry.value.JPCount}
+                   ,jackpots=${entry.value.JPCount*59*entry.key.getStakeAnte(entry.key)}
+                   ,buffet=${(entry.value.generalRake+entry.value.jackpotRake)*0.1}">
+
             <td th:text="${stake}"></td>
             <td th:text="${hands}"></td>
             <td th:text="${#numbers.formatDecimal(ggRake,0,0)} + ' ' +'('+ |${#numbers.formatDecimal(ggRake/hands/ante*100,0,1)}|+')'"></td>
             <td th:text="${#numbers.formatDecimal(jpRake,0,0)} + ' ' +'('+ |${#numbers.formatDecimal(jpRake/hands/ante*100,0,1)}|+')'"></td>
-            <td th:text="${#numbers.formatDecimal((ggRake+jpRake),0,1)} + ' ' +'('+ |${#numbers.formatDecimal((ggRake+jpRake)/hands/ante*100,0,1)}|+')'"></td>
-            <td th:text="${#numbers.formatDecimal((profit),0,1)} + ' ' +'('+ |${#numbers.formatDecimal((profit)/hands/ante*100,0,1)}|+')'"></td>
+            <td th:text="${#numbers.formatDecimal(jackpots,0,0)} +' ' +'['+ |${#numbers.formatDecimal(jpCount/hands*1000,0,1)}|+']'+ ' ' +'('+ |${#numbers.formatDecimal(jackpots/hands/ante*100,0,1)}|+')'"></td>
+            <td th:text="${#numbers.formatDecimal(buffet,0,0)} + ' ' +'('+ |${#numbers.formatDecimal(buffet/hands*100,0,1)}|+')'"></td>
+            <td th:text="${#numbers.formatDecimal(profit+buffet+jackpots,0,0)} + ' ' +'('+ |${#numbers.formatDecimal((profit+buffet+jackpots)/hands/ante*100,0,1)}|+')'"></td>
         </tr>
     </table>
 

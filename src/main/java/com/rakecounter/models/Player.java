@@ -12,6 +12,7 @@ public class Player {
 
     private double preInvestments;
     private boolean isSawFlop;
+    //TODO DO REAL IS SAW FLOP, NOW ITS WORK HOW isFlopDealt. Same turn, river.
     private double flopInvestments;
     private boolean isSawTurn;
     private double turnInvestments;
@@ -21,6 +22,15 @@ public class Player {
     private double profit;
     private double ggRake;
     private double jpRake;
+    private boolean isJackpot;
+
+    public boolean isJackpot() {
+        return isJackpot;
+    }
+
+    public void setJackpot(boolean jackpot) {
+        isJackpot = jackpot;
+    }
 
     public double getBU() {
         return BU;

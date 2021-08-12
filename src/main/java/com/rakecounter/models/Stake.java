@@ -23,4 +23,5 @@ public enum Stake {
     public static double getStakeAnte(Stake level) {
         return BY_LEVEL.get(level);
     }
+    //TODO переделать без поля как в рангах
 }

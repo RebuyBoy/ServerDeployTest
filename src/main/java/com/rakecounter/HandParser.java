@@ -13,9 +13,9 @@ import java.util.regex.Pattern;
 @Component
 public class HandParser {
 
+    static int count = 0;
     private final String SPLIT_HANDS_BY_LINE = "Poker Hand ";
     private final String CURRENCY = "\\$(\\d+(?:.\\d+)?)";
-    private final String stakeSizeHeroRegex = "Seat \\d: Hero \\(" + CURRENCY + " in chips\\)";
     private String basicInfoRegex = "#SD(\\d+): ShortDeck No Limit  \\(\\$(\\d+(?:.\\d+)?)\\) - (.+\\d)";
     private List<HandHistory> handlist;
     private PreflopParser preflopParser;
@@ -34,7 +34,6 @@ public class HandParser {
         this.playerParser = playerParser;
         this.handlist = new ArrayList<>();
     }
-
 
     public Map<Stake, CountResult> parse(List<String> hands) {
         for (String partOfHands : hands) {
@@ -66,6 +65,11 @@ public class HandParser {
                 double jpRake = player.getJpRake();
                 double jackpotRake = countResult.getJackpotRake();
                 countResult.setJackpotRake(jpRake + jackpotRake);
+
+                if(player.isJackpot()){
+                    double jpCount = countResult.getJPCount();
+                    countResult.setJPCount(++jpCount);
+                }
             } else {
                 CountResult countResult = new CountResult();
                 countResult.setNumberOfHands(1);
@@ -86,11 +90,10 @@ public class HandParser {
 
         handHistory.setPlayer(player);
         handHistory.setHandHistory(handSample);
+        Matcher matcher = Pattern.compile("Hero.+with Royal Flush").matcher(handSample);
+        player.setJackpot(matcher.find());
 
         String handNumber = getHandNumber(handSample);
-        if (handNumber.equals("41990781")) {
-            System.out.println(handSample);
-        }
         handHistory.setHandID(handNumber);
 
         Stake stake = parseHandHistoryStakeLevel(handSample);

@@ -1,10 +1,19 @@
-package com.rakecounter;
+package com.rakecounter.models;
 
 public class CountResult {
     private int numberOfHands;
     private double generalRake;
     private double jackpotRake;
     private double profit;
+    private double JPCount;
+
+    public double getJPCount() {
+        return JPCount;
+    }
+
+    public void setJPCount(double JPCount) {
+        this.JPCount = JPCount;
+    }
 
     public double getProfit() {
         return profit;

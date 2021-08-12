@@ -1,5 +1,6 @@
 package com.rakecounter;
 
+import com.rakecounter.models.CountResult;
 import com.rakecounter.models.Stake;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -36,7 +37,7 @@ public class ApplicationController {
     protected String main(Model model) {
         Map<Stake, CountResult> results = new HashMap<>();
         model.addAttribute("result", results);
-        return "test";
+        return "rakeTable";
     }
 
     @PostMapping

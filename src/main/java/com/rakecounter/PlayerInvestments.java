@@ -11,14 +11,11 @@ import java.util.regex.Pattern;
 public class PlayerInvestments {
     private final String CURRENCY = "\\$(\\d+(?:.\\d+)?)";
     private final String collectedRegex = "Hero collected " + CURRENCY + " from pot";
-    private final String collectedAnyRegex = "(?![Hero])\\w+ collected " + CURRENCY + " from pot";
-    private final String totalPotRegex = "Total pot " + CURRENCY;
     private final String postBigBlindRegex = "Hero: posts button blind " + CURRENCY;
     private String uncalledBetRegex = "Uncalled bet \\(\\$(\\d+(?:.\\d+)?)\\) returned to Hero";
     private String callsRegex = "Hero: calls \\$(\\d+.?\\d*)";
     private String betsRegex = "Hero: bets \\$(\\d+.?\\d*)";
     private String raisesRegex = "Hero: raises \\$(\\d+(?:.\\d+)?)(?: to \\$(\\d*(?:.\\d+)?))?";
-    //ПРОВЕРКА ВЫЧИТАТЬ ИЗ СТАРТОВГО СТЕКА
 
     public double countInvestments(String actionsSample) {
         if (actionsSample == null || actionsSample.length() == 0) {
@@ -49,7 +46,7 @@ public class PlayerInvestments {
             if (action.contains("Hero: raises")) {
                 Matcher matcher = Pattern.compile(raisesRegex).matcher(action);
                 if (matcher.find()) {
-                    if (matcher.group(2)==null) {
+                    if (matcher.group(2) == null) {
                         raises = Double.parseDouble(matcher.group(1));
                     } else {
                         raises = Double.parseDouble(matcher.group(2));

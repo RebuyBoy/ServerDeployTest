@@ -1,14 +1,16 @@
 package com.rakecounter;
 
+import com.rakecounter.dtos.Sessions;
 import com.rakecounter.models.*;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Component
 public class HandParser {
@@ -33,12 +35,6 @@ public class HandParser {
         this.showdownParser = showdownParser;
         this.playerParser = playerParser;
         this.handlist = new ArrayList<>();
-    }
-
-    public static void main(String[] args) {
-        String a = "1,204.04";
-        double v = Double.parseDouble(a);
-        System.out.println(v);
     }
 
     public Map<Stake, CountResult> parse(List<String> hands) {
@@ -76,6 +72,7 @@ public class HandParser {
                     double jpCount = countResult.getJPCount();
                     countResult.setJPCount(++jpCount);
                 }
+
             } else {
                 CountResult countResult = new CountResult();
                 countResult.setNumberOfHands(1);
@@ -83,6 +80,15 @@ public class HandParser {
                 countResult.setJackpotRake(player.getJpRake());
                 countResult.setProfit(player.getProfit());
                 results.put(stake, countResult);
+            }
+        }
+        Map<Stake, Double> sessionsByStake = getSessionsByStake();
+        for (Map.Entry<Stake, Double> entry : sessionsByStake.entrySet()) {
+            Stake stake = entry.getKey();
+            if (results.containsKey(stake)) {
+                CountResult countResult = results.get(stake);
+                double handsPerHour = entry.getValue();
+                countResult.setHandsPerHour(handsPerHour);
             }
         }
         handlist.clear();
@@ -108,8 +114,8 @@ public class HandParser {
         int playersNumber = countPlayers(handSample);
         handHistory.setNumberOfPlayers(playersNumber);
 
-        String date = getDate(handSample);
-        handHistory.setDate(date);
+        long date = getDate(handSample);
+        handHistory.setTimestamp(date);
 
         Preflop preflop = preflopParser.parse(handHistory);
         handHistory.setPreflop(preflop);
@@ -213,14 +219,86 @@ public class HandParser {
         return numberOfPlayers;
     }
 
-    private String getDate(String hand) {
+    //    private String getDate(String hand) {
+//        Matcher matcher = Pattern.compile("\\d{4}/\\d{2}/\\d{2} \\d{2}:\\d{2}:\\d{2}").matcher(hand);
+//        String date = "";
+//        if (matcher.find()) {
+//            date = matcher.group();
+//        }
+//        return date;
+//    }
+    private long getDate(String hand) {
         Matcher matcher = Pattern.compile("\\d{4}/\\d{2}/\\d{2} \\d{2}:\\d{2}:\\d{2}").matcher(hand);
         String date = "";
         if (matcher.find()) {
             date = matcher.group();
         }
-        return date;
+        //TODO проверка формата?
+        DateTimeFormatter formatDateTime = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime localDateTime = LocalDateTime.from(formatDateTime.parse(date));
+        return Timestamp.valueOf(localDateTime).getTime();
     }
+
+    private Map<Stake, Double> getSessionsByStake() {
+        handlist = handlist.stream()
+                .sorted(Comparator.comparingLong(HandHistory::getTimestamp))
+                .collect(Collectors.toList());
+
+        Map<Stake, Sessions> stakeSessionsMap = new HashMap<>();
+        for (HandHistory handHistory : handlist) {
+            long current = handHistory.getTimestamp();
+            Stake stake = handHistory.getStake();
+            if (stakeSessionsMap.containsKey(stake)) {
+                Sessions sessions = stakeSessionsMap.get(stake);
+                Session session = sessions.getSession();
+                long last = session.getLast();
+                long start = session.getStart();
+                if (start < 1) {
+                    session.setStart(current);
+                    session.setLast(current);
+                    session.setHandCount(1);
+                    sessions.getSessions().add(session);
+                } else if (current - last > 300000) {
+                    session.setEnd(last);
+                    session.setDuration(last - start);
+                    long l = (long) session.getHandCount() * 3600000 / session.getDuration();
+                    session.setHandsPerHour((int) l);
+                    sessions.getSessions().add(session);
+                    session = new Session();
+                    sessions.setSession(session);
+                } else {
+                    session.setLast(current);
+                    session.setHandCount(session.getHandCount() + 1);
+                }
+            } else {
+                Sessions sessions = new Sessions();
+                Session session = new Session();
+                session.setStart(current);
+                session.setLast(current);
+                session.setHandCount(1);
+                sessions.setSession(session);
+                sessions.getSessions().add(session);
+                stakeSessionsMap.put(stake, sessions);
+            }
+        }
+        Map<Stake, Double> handsPerHourByStake = new HashMap<>();
+        for (Map.Entry<Stake, Sessions> entry : stakeSessionsMap.entrySet()) {
+            Stake key = entry.getKey();
+            Sessions value = entry.getValue();
+            if (!handsPerHourByStake.containsKey(key)) {
+                List<Session> sessions = value.getSessions();
+                double countHPH = 0;
+                for (Session session : sessions) {
+                    int handsPerHour = session.getHandsPerHour();
+                    countHPH += handsPerHour;
+                }
+                countHPH /= sessions.size();
+                handsPerHourByStake.put(key, countHPH);
+            }
+        }
+        return handsPerHourByStake;
+    }
+
 }
 
 

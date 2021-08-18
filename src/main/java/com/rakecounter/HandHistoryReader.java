@@ -10,9 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HandHistoryReader {
-    private final int maxFileSizeThreshold = 1024 * 1024 * 15;
+    private final int maxFileSizeThreshold = 1024 * 1024 * 18;
+    private final String zipApplication = "application/zip";
 
     public List<String> getHandsFromFiles(MultipartFile[] filePart) {
+        if (filePart == null) {
+            throw new NullPointerException();
+        }
         StringBuilder hands = new StringBuilder();
         List<String> splittedHands = new ArrayList<>();
         for (MultipartFile multipartFile : filePart) {
@@ -29,6 +33,8 @@ public class HandHistoryReader {
                     }
                     hands.append(line).append("\n");
                 }
+                reader.close();
+                inputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

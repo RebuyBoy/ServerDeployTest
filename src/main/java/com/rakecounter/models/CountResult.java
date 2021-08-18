@@ -1,11 +1,23 @@
 package com.rakecounter.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CountResult {
     private int numberOfHands;
     private double generalRake;
     private double jackpotRake;
     private double profit;
     private double JPCount;
+    private double handsPerHour;
+
+    public double getHandsPerHour() {
+        return handsPerHour;
+    }
+
+    public void setHandsPerHour(double handsPerHour) {
+        this.handsPerHour = handsPerHour;
+    }
 
     public double getJPCount() {
         return JPCount;

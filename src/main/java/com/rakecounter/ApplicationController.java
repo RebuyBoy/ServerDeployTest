@@ -46,7 +46,9 @@ public class ApplicationController {
         HandHistoryReader hhr = new HandHistoryReader();
         List<String> hands = hhr.getHandsFromFiles(file);
         Map<Stake, CountResult> results = handParser.parse(hands);
+        CountResult countResult = getTotalResult(results);
         model.addAttribute("result", results);
+        model.addAttribute("totals", countResult);
         userHands.put(sessionId, hands);
         return "rakeTable";
     }
@@ -64,5 +66,37 @@ public class ApplicationController {
         outputStream.write(archive);
         outputStream.flush();
         return "rakeTable";
+    }
+
+    private CountResult getTotalResult(Map<Stake, CountResult> resultMap) {
+        CountResult countResult = new CountResult();
+        int hands = 0;
+        int handsPerHour = 0;
+        double ggRake = 0;
+        double jpRake = 0;
+        double profit = 0;
+        double JpCount = 0;
+        double stakeCount = 0;
+        for (Map.Entry<Stake, CountResult> resultEntry : resultMap.entrySet()) {
+            Stake key = resultEntry.getKey();
+            if (Stake.UNK.equals(key)) {
+                continue;
+            }
+            CountResult value = resultEntry.getValue();
+            stakeCount++;
+            handsPerHour += value.getHandsPerHour();
+            hands += value.getNumberOfHands();
+            ggRake += value.getGeneralRake();
+            jpRake += value.getJackpotRake();
+            profit += value.getProfit();
+            JpCount += value.getJPCount() * 59 * Stake.getAnteByStake(key);
+        }
+        countResult.setHandsPerHour(stakeCount);
+        countResult.setGeneralRake(ggRake);
+        countResult.setProfit(profit);
+        countResult.setJackpotRake(jpRake);
+        countResult.setJPCount(JpCount);
+        countResult.setNumberOfHands(hands);
+        return countResult;
     }
 }

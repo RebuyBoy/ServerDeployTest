@@ -3,7 +3,7 @@ package com.rakecounter.models;
 public class HandHistory {
     private String HandHistory;
     private String handID;
-    private String date;
+    private long timestamp;
     private Stake stake;
     private int numberOfPlayers;
     private double totalPot;
@@ -17,6 +17,14 @@ public class HandHistory {
     private Showdown showdown;
 //    private Summary Summary;
     private Player player;
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
 
     public Turn getTurn() {
         return turn;
@@ -64,14 +72,6 @@ public class HandHistory {
 
     public void setJpRake(double jpRake) {
         this.jpRake = jpRake;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
     }
 
     public double getTotalPot() {

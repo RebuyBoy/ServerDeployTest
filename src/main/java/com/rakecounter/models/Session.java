@@ -6,7 +6,7 @@ public class Session {
     private long last;
     private long duration;
     private int handCount;
-    private int handsPerHour;
+    private double handsPerHour;
 
     public long getLast() {
         return last;
@@ -48,11 +48,11 @@ public class Session {
         this.handCount = handCount;
     }
 
-    public int getHandsPerHour() {
+    public double getHandsPerHour() {
         return handsPerHour;
     }
 
-    public void setHandsPerHour(int handsPerHour) {
+    public void setHandsPerHour(double handsPerHour) {
         this.handsPerHour = handsPerHour;
     }
 }

@@ -82,7 +82,7 @@ public class HandParser {
                 results.put(stake, countResult);
             }
         }
-        Map<Stake, Double> sessionsByStake = getSessionsByStake();
+        Map<Stake, Double> sessionsByStake = getHandsPerHourByStake();
         for (Map.Entry<Stake, Double> entry : sessionsByStake.entrySet()) {
             Stake stake = entry.getKey();
             if (results.containsKey(stake)) {
@@ -91,6 +91,11 @@ public class HandParser {
                 countResult.setHandsPerHour(handsPerHour);
             }
         }
+        double handsPerHour = getHandsPerHour();
+        CountResult countResult = new CountResult();
+        countResult.setHandsPerHour(handsPerHour);
+        System.out.println(countResult);
+        results.put(Stake.TOTAL, countResult);
         handlist.clear();
         return results;
     }
@@ -239,7 +244,7 @@ public class HandParser {
         return Timestamp.valueOf(localDateTime).getTime();
     }
 
-    private Map<Stake, Double> getSessionsByStake() {
+    private Map<Stake, Double> getHandsPerHourByStake() {
         handlist = handlist.stream()
                 .sorted(Comparator.comparingLong(HandHistory::getTimestamp))
                 .collect(Collectors.toList());
@@ -258,11 +263,11 @@ public class HandParser {
                     session.setLast(current);
                     session.setHandCount(1);
                     sessions.getSessions().add(session);
-                } else if (current - last > 300000) {
+                } else if (current - last > 200000) {
                     session.setEnd(last);
                     session.setDuration(last - start);
-                    long l = (long) session.getHandCount() * 3600000 / (session.getDuration()+1);
-                    session.setHandsPerHour((int) l);
+                    double l = (double) session.getHandCount() * 3600000 / (session.getDuration() + 1);
+                    session.setHandsPerHour(l);
                     sessions.getSessions().add(session);
                     session = new Session();
                     sessions.setSession(session);
@@ -289,7 +294,13 @@ public class HandParser {
                 List<Session> sessions = value.getSessions();
                 double countHPH = 0;
                 for (Session session : sessions) {
-                    int handsPerHour = session.getHandsPerHour();
+                    double handsPerHour = session.getHandsPerHour();
+                    if (handsPerHour == 0) {
+                        long last = session.getLast();
+                        long start = session.getStart();
+                        long duration = last - start;
+                        handsPerHour = (double) session.getHandCount() * 3600000 / (duration + 1);
+                    }
                     countHPH += handsPerHour;
                 }
                 countHPH /= sessions.size();
@@ -299,6 +310,50 @@ public class HandParser {
         return handsPerHourByStake;
     }
 
+    private double getHandsPerHour() {
+        handlist = handlist.stream()
+                .sorted(Comparator.comparingLong(HandHistory::getTimestamp))
+                .collect(Collectors.toList());
+        List<Session> sessions = new ArrayList<>();
+        Session session = new Session();
+        for (HandHistory handHistory : handlist) {
+            long current = handHistory.getTimestamp();
+            long start = session.getStart();
+            long last = session.getLast();
+            if (start < 1) {
+                session.setStart(current);
+                session.setLast(current);
+                session.setHandCount(1);
+            } else if (last - start > 200000) {
+                long end = session.getLast();
+                session.setEnd(end);
+                long duration = end - start;
+                session.setDuration(duration);
+                int handCount = session.getHandCount();
+                double handsPerHour = (double) handCount * 3600000 / (duration + 1);
+                session.setHandsPerHour(handsPerHour);
+                sessions.add(session);
+                session = new Session();
+            } else {
+                session.setLast(current);
+                int handCount = session.getHandCount() + 1;
+                session.setHandCount(handCount);
+            }
+        }
+        double countHPH = 0;
+        for (Session session1 : sessions) {
+            double handsPerHour = session1.getHandsPerHour();
+            if (handsPerHour == 0) {
+                long last = session1.getLast();
+                long start = session1.getStart();
+                long duration = last - start;
+                handsPerHour = (double) session1.getHandCount() * 3600000 / (duration + 1);
+            }
+            countHPH += handsPerHour;
+        }
+        countHPH /= sessions.size();
+        return countHPH;
+    }
 }
 
 

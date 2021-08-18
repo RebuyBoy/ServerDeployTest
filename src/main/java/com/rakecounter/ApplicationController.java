@@ -76,10 +76,15 @@ public class ApplicationController {
         double jpRake = 0;
         double profit = 0;
         double JpCount = 0;
-        double stakeCount = 0;
+        int stakeCount = 0;
         for (Map.Entry<Stake, CountResult> resultEntry : resultMap.entrySet()) {
             Stake key = resultEntry.getKey();
             if (Stake.UNK.equals(key)) {
+                continue;
+            }
+            if (Stake.TOTAL.equals(key)) {
+                double value = resultEntry.getValue().getHandsPerHour();
+                countResult.setHandsPerHour(value);
                 continue;
             }
             CountResult value = resultEntry.getValue();
@@ -91,12 +96,12 @@ public class ApplicationController {
             profit += value.getProfit();
             JpCount += value.getJPCount() * 59 * Stake.getAnteByStake(key);
         }
-        countResult.setHandsPerHour(stakeCount);
         countResult.setGeneralRake(ggRake);
         countResult.setProfit(profit);
         countResult.setJackpotRake(jpRake);
         countResult.setJPCount(JpCount);
         countResult.setNumberOfHands(hands);
+        countResult.setCount(stakeCount);
         return countResult;
     }
 }

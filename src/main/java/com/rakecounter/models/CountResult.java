@@ -10,6 +10,15 @@ public class CountResult {
     private double profit;
     private double JPCount;
     private double handsPerHour;
+    private int count;
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
 
     public double getHandsPerHour() {
         return handsPerHour;

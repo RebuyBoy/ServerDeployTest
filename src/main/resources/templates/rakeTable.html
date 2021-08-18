@@ -48,7 +48,7 @@
         </tr>
         </thead>
         <tr style="background-color: darkgray" th:each="entry,iterStat : ${result}"
-            th:if="not ${entry.key.name().equals('UNK')} "
+            th:if="not ${entry.key.name().equals('UNK') or entry.key.name().equals('TOTAL')}"
             th:with="hands=${entry.value.numberOfHands}
                    ,stake=${entry.key.toString().substring(2)}
                    ,rake=${entry.value.generalRake}+${entry.value.jackpotRake}
@@ -67,7 +67,7 @@
             <td th:text="${#numbers.formatDecimal(buffet,0,0)} + ' ' +'('+ |${#numbers.formatDecimal(buffet/hands/ante*100,0,1)}|+')'"></td>
             <td th:text="${#numbers.formatDecimal(profit+buffet+jackpots,0,0)} + ' ' +'('+ |${#numbers.formatDecimal((profit+buffet+jackpots)/hands/ante*100,0,1)}|+')'"></td>
         </tr>
-        <tr th:if="${totals.handsPerHour > 1}" style="background-color: lightslategray"
+        <tr th:if="${totals.count > 1}" style="background-color: lightslategray"
             th:with="hands=${totals.numberOfHands}
                     ,rake=${totals.jackpotRake+totals.generalRake}
                     ,handsPerHour=${totals.handsPerHour}
@@ -76,7 +76,7 @@
                     ,buffet=${(totals.jackpotRake+totals.generalRake)*0.1}">
             <td th:text="-_-"></td>
             <td th:text="${hands}"></td>
-            <td th:text="-_-"></td>
+            <td th:text="${#numbers.formatDecimal(handsPerHour,0,0)}"></td>
             <td th:text="${#numbers.formatDecimal(rake,0,0)}"></td>
             <td th:text="${#numbers.formatDecimal(jackpots,0,0)}"></td>
             <td th:text="${#numbers.formatDecimal(buffet,0,0)}"></td>

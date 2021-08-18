@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum Stake {
-    S_1000, S_500, S_200, S_100, S_50, S_25, S_10, S_5, S_2, UNK;
+    S_1000, S_500, S_200, S_100, S_50, S_25, S_10, S_5, S_2, TOTAL, UNK;
 
     private static final Map<Stake, Double> BY_LEVEL = new HashMap<>();
 

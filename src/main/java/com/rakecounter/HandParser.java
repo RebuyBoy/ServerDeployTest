@@ -261,7 +261,7 @@ public class HandParser {
                 } else if (current - last > 300000) {
                     session.setEnd(last);
                     session.setDuration(last - start);
-                    long l = (long) session.getHandCount() * 3600000 / session.getDuration();
+                    long l = (long) session.getHandCount() * 3600000 / (session.getDuration()+1);
                     session.setHandsPerHour((int) l);
                     sessions.getSessions().add(session);
                     session = new Session();

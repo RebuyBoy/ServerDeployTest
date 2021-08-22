@@ -50,6 +50,8 @@ public class PlayerParser {
         player.setGgRake(playerInvestments.countGGRake(handHistory));
         player.setJpRake(playerInvestments.countJpRake(handHistory));
         player.setProfit(playerInvestments.countProfit(handHistory));
+        player.setvPip(isVpip(handHistory));
+
         boolean sawFlop = isFold(handHistory.getPreflop().getActions());
         player.setSawFlop(sawFlop);
         if (sawFlop) {
@@ -140,6 +142,29 @@ public class PlayerParser {
             return group.replaceAll(",", "");
         }
         return group;
+    }
+
+    private boolean allFold(HandHistory handHistory) {
+        String actions = handHistory.getPreflop().getActions();
+        int numberOfPlayers = handHistory.getNumberOfPlayers();
+        int foldsCount = 0;
+        Matcher matcher = Pattern.compile("\\w+: folds").matcher(actions);
+        if (matcher.find()) {
+            foldsCount++;
+        }
+        return foldsCount == numberOfPlayers - 1;
+    }
+
+    private boolean isVpip(HandHistory handHistory) {
+        Position position = handHistory.getPlayer().getPosition();
+        double preInvestments = handHistory.getPlayer().getPreInvestments();
+        if (position.equals(Position.BU)) {
+            if (allFold(handHistory)) {
+                return true;
+            }
+            return preInvestments > 1;
+        }
+        return preInvestments > 0;
     }
 
 

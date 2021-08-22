@@ -16,9 +16,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024, // 1 MB
@@ -71,7 +69,7 @@ public class ApplicationController {
     private CountResult getTotalResult(Map<Stake, CountResult> resultMap) {
         CountResult countResult = new CountResult();
         int hands = 0;
-        int handsPerHour = 0;
+        List<Integer> vPips = new ArrayList<>();
         double ggRake = 0;
         double jpRake = 0;
         double profit = 0;
@@ -89,13 +87,15 @@ public class ApplicationController {
             }
             CountResult value = resultEntry.getValue();
             stakeCount++;
-            handsPerHour += value.getHandsPerHour();
             hands += value.getNumberOfHands();
             ggRake += value.getGeneralRake();
             jpRake += value.getJackpotRake();
             profit += value.getProfit();
             JpCount += value.getJPCount() * 59 * Stake.getAnteByStake(key);
+            vPips.add(value.getvPip());
         }
+
+        countResult.setvPip(averageVpip(vPips));
         countResult.setGeneralRake(ggRake);
         countResult.setProfit(profit);
         countResult.setJackpotRake(jpRake);
@@ -103,5 +103,13 @@ public class ApplicationController {
         countResult.setNumberOfHands(hands);
         countResult.setCount(stakeCount);
         return countResult;
+    }
+
+    private int averageVpip(List<Integer> vPips) {
+        int sum = 0;
+        for (Integer vPip : vPips) {
+            sum += vPip;
+        }
+        return sum;
     }
 }

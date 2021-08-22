@@ -1,8 +1,5 @@
 package com.rakecounter.models;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class CountResult {
     private int numberOfHands;
     private double generalRake;
@@ -10,7 +7,16 @@ public class CountResult {
     private double profit;
     private double JPCount;
     private double handsPerHour;
+    private int vPip;
     private int count;
+
+    public int getvPip() {
+        return vPip;
+    }
+
+    public void setvPip(int vPip) {
+        this.vPip = vPip;
+    }
 
     public int getCount() {
         return count;

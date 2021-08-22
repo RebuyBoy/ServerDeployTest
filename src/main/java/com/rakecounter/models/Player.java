@@ -9,10 +9,10 @@ public class Player {
     private double stackSize;
     private double BU;
     private double ante;
+    private boolean vPip;
 
     private double preInvestments;
     private boolean isSawFlop;
-    //TODO DO REAL IS SAW FLOP, NOW ITS WORK HOW isFlopDealt. Same turn, river.
     private double flopInvestments;
     private boolean isSawTurn;
     private double turnInvestments;
@@ -23,6 +23,15 @@ public class Player {
     private double ggRake;
     private double jpRake;
     private boolean isJackpot;
+
+
+    public boolean isvPip() {
+        return vPip;
+    }
+
+    public void setvPip(boolean vPip) {
+        this.vPip = vPip;
+    }
 
     public boolean isJackpot() {
         return isJackpot;

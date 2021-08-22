@@ -72,6 +72,10 @@ public class HandParser {
                     double jpCount = countResult.getJPCount();
                     countResult.setJPCount(++jpCount);
                 }
+                if(player.isvPip()){
+                    int vpipCount = countResult.getvPip()+1;
+                    countResult.setvPip(vpipCount);
+                }
 
             } else {
                 CountResult countResult = new CountResult();

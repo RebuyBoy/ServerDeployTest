@@ -8,7 +8,16 @@ public class CountResult {
     private double JPCount;
     private double handsPerHour;
     private int vPip;
+    private int allFolds;
     private int count;
+
+    public int getAllFolds() {
+        return allFolds;
+    }
+
+    public void setAllFolds(int allFolds) {
+        this.allFolds = allFolds;
+    }
 
     public int getvPip() {
         return vPip;

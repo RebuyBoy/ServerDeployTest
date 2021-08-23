@@ -155,16 +155,22 @@ public class PlayerParser {
         return foldsCount == numberOfPlayers - 1;
     }
 
-    private boolean isVpip(HandHistory handHistory) {
+    private int isVpip(HandHistory handHistory) {
         Position position = handHistory.getPlayer().getPosition();
         double preInvestments = handHistory.getPlayer().getPreInvestments();
+        double ante = handHistory.getPlayer().getAnte();
+        preInvestments /= ante;
         if (position.equals(Position.BU)) {
             if (allFold(handHistory)) {
-                return true;
+                return -1;
             }
-            return preInvestments > 1;
+            if (preInvestments > 1) {
+                return 1;
+            }
+        } else if (preInvestments > 0) {
+            return 1;
         }
-        return preInvestments > 0;
+        return 0;
     }
 
 

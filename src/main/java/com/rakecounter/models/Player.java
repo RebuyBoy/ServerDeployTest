@@ -9,7 +9,7 @@ public class Player {
     private double stackSize;
     private double BU;
     private double ante;
-    private boolean vPip;
+    private int vPip;
 
     private double preInvestments;
     private boolean isSawFlop;
@@ -25,11 +25,11 @@ public class Player {
     private boolean isJackpot;
 
 
-    public boolean isvPip() {
+    public int getvPip() {
         return vPip;
     }
 
-    public void setvPip(boolean vPip) {
+    public void setvPip(int vPip) {
         this.vPip = vPip;
     }
 
